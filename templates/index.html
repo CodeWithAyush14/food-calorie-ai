@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Food Detector</title>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, sans-serif;
+        }
+
+        body{
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background:linear-gradient(135deg,#667eea,#764ba2,#ff6b6b);
+            padding:20px;
+        }
+
+        .container{
+            width:100%;
+            max-width:480px;
+            max-height:90vh;
+            overflow-y:auto;
+            background:white;
+            padding:30px;
+            border-radius:20px;
+            text-align:center;
+            position:relative;
+        }
+
+        h1{margin-bottom:5px;}
+
+        .subtitle{
+            color:#777;
+            font-size:14px;
+            margin-bottom:15px;
+        }
+
+        .drop-zone{
+            border:2px dashed #764ba2;
+            padding:20px;
+            border-radius:15px;
+            cursor:pointer;
+            transition:0.3s;
+            display:block;
+            font-size:14px;
+            color:#555;
+        }
+
+        .drop-zone:hover, .drop-zone.dragover{
+            background:#f3f3ff;
+            border-color:#ff6a00;
+        }
+
+        input{
+            display:none;
+        }
+
+        .preview-wrap{
+            width:100%;
+            max-height:280px;
+            overflow:hidden;
+            border-radius:15px;
+            margin-top:15px;
+            position:relative;
+        }
+
+        .preview-wrap img{
+            width:100%;
+            height:280px;
+            object-fit:cover;
+            display:block;
+        }
+
+        .analyze-btn{
+            width:100%;
+            padding:14px;
+            margin-top:15px;
+            border:none;
+            border-radius:15px;
+            color:white;
+            font-size:16px;
+            cursor:pointer;
+            background:linear-gradient(135deg,#ff6a00,#ee0979,#764ba2);
+            transition:0.3s;
+        }
+
+        .analyze-btn:hover{
+            transform:scale(1.03);
+        }
+
+        .reset-btn{
+            width:100%;
+            padding:12px;
+            margin-top:10px;
+            border:1px solid #ddd;
+            border-radius:15px;
+            color:#555;
+            background:white;
+            font-size:14px;
+            cursor:pointer;
+            transition:0.3s;
+        }
+
+        .reset-btn:hover{
+            background:#f5f5f5;
+        }
+
+        .result{
+            margin-top:20px;
+            padding:15px;
+            background:#f5f5f5;
+            border-radius:12px;
+            text-align:left;
+        }
+
+        .result h2{
+            text-align:center;
+            margin-bottom:10px;
+        }
+
+        .confidence-label{
+            display:flex;
+            justify-content:space-between;
+            font-size:13px;
+            color:#555;
+            margin-bottom:6px;
+        }
+
+        .confidence-bar{
+            width:100%;
+            height:10px;
+            background:#e0e0e0;
+            border-radius:6px;
+            overflow:hidden;
+        }
+
+        .confidence-fill{
+            height:100%;
+            border-radius:6px;
+            background:linear-gradient(135deg,#ff6a00,#ee0979,#764ba2);
+            transition:width 0.6s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🍔 AI Food Detector</h1>
+    <p class="subtitle">Upload → Analyze → Get Result</p>
+
+    <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
+        <label class="drop-zone" id="dropZone">
+            📁 Click or Drop Image Here
+            <input type="file" name="file" id="fileInput" accept="image/*" required>
+        </label>
+    </form>
+
+    {% if image %}
+        <div class="preview-wrap">
+            <img src="{{ url_for('uploaded_file', filename=image) }}">
+        </div>
+
+        <form action="/analyze" method="POST">
+            <button class="analyze-btn" type="submit">
+                ⚡ Analyze with AI
+            </button>
+        </form>
+
+        <form action="/reset" method="POST">
+            <button class="reset-btn" type="submit">
+                🔄 Remove / Upload New Image
+            </button>
+        </form>
+    {% endif %}
+
+    {% if result %}
+    <div class="result">
+        <h2>{{ result }}</h2>
+
+        <div class="confidence-label">
+            <span>Confidence</span>
+            <span>{{ confidence }}</span>
+        </div>
+        <div class="confidence-bar">
+            <div class="confidence-fill" style="width: {{ confidence_value }}%;"></div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const uploadForm = document.getElementById('uploadForm');
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            uploadForm.submit();
+        }
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.add('dragover');
+        });
+    });
+
+    ['dragleave', 'dragend'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('dragover');
+        });
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove('dragover');
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            uploadForm.submit();
+        }
+    });
+</script>
+
+</body>
+</html>

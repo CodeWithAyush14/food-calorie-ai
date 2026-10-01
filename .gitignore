@@ -1,0 +1,72 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# =========================
+# Environment / Secrets
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Datasets / Large Data
+# =========================
+data/
+data/raw/
+data/processed/
+
+# =========================
+# Generated files
+# =========================
+logs/
+runs/
+wandb/
+uploads/
+
+# =========================
+# Node / Frontend
+# =========================
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# =========================
+# OS
+# =========================
+.DS_Store
+
+# =========================
+# ML model files
+# =========================
+*.onnx
+
+# YOLO model is handled separately if needed
+# *.pt
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Temporary files
+# =========================
+*.swp
+*.tmp
+*.bak
